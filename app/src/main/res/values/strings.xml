@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">CameraPicturesViewer</string>
+
+    <string name="unknown_orientation_error">Unknown device orientation</string>
+
+</resources>
