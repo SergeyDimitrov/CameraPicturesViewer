@@ -1,18 +1,22 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
+<RelativeLayout
+    android:id="@+id/grid_container"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".CameraPicturesViewerActivity">
-    
-    <GridView
+
+    <com.jess.ui.TwoWayGridView
         android:id="@+id/gallery_view"
-        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:numColumns="4"
-        >
-        
-    </GridView>
+        android:layout_width="match_parent"
+        app:numRows="2"
+        android:background="#E8E8E8"
+        app:scrollDirectionPortrait="horizontal"
+        app:scrollDirectionLandscape="horizontal"
+        app:gravity="center"
+        app:verticalSpacing="0dp"
+        app:horizontalSpacing="0dp" />
 
 </RelativeLayout>

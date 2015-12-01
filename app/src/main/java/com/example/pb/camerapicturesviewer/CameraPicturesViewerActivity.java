@@ -1,5 +1,6 @@
 package com.example.pb.camerapicturesviewer;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -17,59 +18,60 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jess.ui.TwoWayAdapterView;
+import com.jess.ui.TwoWayGridView;
+
 import java.io.File;
+import java.io.FilenameFilter;
 
-// Rotation
-// Empty list
+public class CameraPicturesViewerActivity extends Activity {
 
-public class CameraPicturesViewerActivity extends AppCompatActivity {
-
-    private OrientationEventListener orientationEventListener;
-    private static final int delta = 10;
-    private GridView gallery;
+    private TwoWayGridView gallery;
+    private static final int ROWS_COUNT_PORTRAIT = 4;
+    private static final int ROWS_COUNT_LANDSCAPE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera_pictures_viewer);
-        orientationEventListener = new OrientationEventListener(this) {
+
+        gallery = (TwoWayGridView)findViewById(R.id.gallery_view);
+        File directory = new File(Environment.getExternalStorageDirectory().getPath() + "/DCIM/Camera");
+
+        String[] paths = directory.list(new FilenameFilter() {
             @Override
-            public void onOrientationChanged(int orientation) {
-                if (orientation > 90 - delta && orientation < 90 + delta) rotateScreen(90);
-                else if (orientation < delta || orientation > 360 - delta) rotateScreen(0);
-                else if (orientation > 270 - delta && orientation < 270 + delta) rotateScreen(270);
-                rotateScreen(orientation);
+            public boolean accept(File dir, String filename) {
+                return filename.endsWith(".jpg");
             }
-        };
+        });
 
-        gallery = (GridView)findViewById(R.id.gallery_view);
-        File dir = new File(Environment.getExternalStorageDirectory().getPath() + "/DCIM/Camera");
-
-
-        String[] paths = new String[dir.listFiles().length];
         for(int i = 0; i < paths.length; i++) {
-            paths[i] = dir.listFiles()[i].getAbsolutePath();
+            paths[i] = directory.getAbsolutePath() + "/" + paths[i];
         }
 
-        int numOfColumns = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? 4 : 2;
-        int width;
-        int height;
+        int numOfRows = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ?
+                ROWS_COUNT_LANDSCAPE : ROWS_COUNT_PORTRAIT;
+
+        int screenHeight;
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        height = displayMetrics.heightPixels;
-        width = displayMetrics.widthPixels;
-        Log.d("myTAG", "Height: " + height);
-        Log.d("myTAG", "Width: " + width);
+        screenHeight = displayMetrics.heightPixels;
 
+        Log.d("myTAG1", "Width: " + screenHeight);
+        Log.d("myTAG1", "Rows count: " + numOfRows);
 
-        GalleryAdapter adapter = new GalleryAdapter(this, paths, width / numOfColumns, numOfColumns);
+        RelativeLayout layout = (RelativeLayout)findViewById(R.id.grid_container);
+        Log.d("myTAG1", "Layout width: " + layout.getWidth() + " " + layout.getHeight());
+
+        GalleryAdapter adapter = new GalleryAdapter(this, paths, screenHeight / numOfRows);
         gallery.setAdapter(adapter);
-        gallery.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        gallery.setOnItemClickListener(new TwoWayAdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(TwoWayAdapterView<?> parent, View view, int position, long id) {
                 String path = (String) gallery.getItemAtPosition(position);
                 if (path != null) {
                     Intent openingIntent = new Intent();
@@ -81,34 +83,4 @@ public class CameraPicturesViewerActivity extends AppCompatActivity {
             }
         });
     }
-
-    private void rotateScreen(int angle) {
-        Log.d("myTAG", "Angle: " + angle);
-        switch (angle) {
-            case 0:
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                break;
-            case 90:
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                break;
-            case 270:
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                break;
-            default:
-                Toast.makeText(this, R.string.unknown_orientation_error, Toast.LENGTH_SHORT).show();
-                break;
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        orientationEventListener.enable();
-    }
-
-    protected void onPause() {
-        super.onPause();
-        orientationEventListener.disable();
-    }
-
 }

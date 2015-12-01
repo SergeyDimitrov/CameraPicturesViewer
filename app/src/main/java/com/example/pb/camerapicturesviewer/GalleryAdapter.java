@@ -10,8 +10,9 @@ import android.os.AsyncTask;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
+
+import com.jess.ui.TwoWayAbsListView;
 
 import java.lang.ref.WeakReference;
 
@@ -19,49 +20,33 @@ public class GalleryAdapter extends BaseAdapter {
 
     private Context context;
     private int width;
-    private int rowsCount;
-    private int itemsCount;
     private String[] paths;
 
-    public GalleryAdapter(Context context, String[] paths, int width, int rowsCount) {
+    public GalleryAdapter(Context context, String[] paths, int width) {
         this.context = context;
         this.width = width;
-        this.rowsCount = rowsCount;
         this.paths = paths;
-        this.itemsCount = rowsCount * ((paths.length + rowsCount - 1) / rowsCount);
     }
 
     public int getCount() {
-        return itemsCount;
-    }
-
-    public int getPosition(int position) {
-        int lowest = position / rowsCount * rowsCount; // lowest position at this row
-        int highest = lowest + rowsCount - 1;
-        return lowest + highest - position;
+        return paths.length;
     }
 
     public Object getItem(int position) {
-        position = getPosition(position);
-        if (position >= paths.length) return null;
-        else return paths[position];
+        return paths[position];
     }
 
     public long getItemId(int position) {
-        return getPosition(position);
+        return position;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView imageView;
-        position = getPosition(position);
 
-        width = ((GridView) parent).getRequestedColumnWidth();
-
-        if (position >= paths.length) return new ImageView(context);
-        else if (convertView == null) {
+        if (convertView == null) {
             imageView = new ImageView(context);
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setLayoutParams(new GridView.LayoutParams(width, width));
+            imageView.setLayoutParams(new TwoWayAbsListView.LayoutParams(width, width));
         } else {
             imageView = (ImageView) convertView;
         }
@@ -85,7 +70,7 @@ public class GalleryAdapter extends BaseAdapter {
 
         public AsyncDrawable(Resources res, Bitmap bitmap, BitmapWorkerTask bitmapWorkerTask) {
             super(res, bitmap);
-            bitmapWorkerTaskReference = new WeakReference<BitmapWorkerTask>(bitmapWorkerTask);
+            bitmapWorkerTaskReference = new WeakReference<>(bitmapWorkerTask);
         }
 
         public BitmapWorkerTask getBitmapWorkerTask() {
@@ -124,7 +109,7 @@ public class GalleryAdapter extends BaseAdapter {
         private int data;
 
         public BitmapWorkerTask(ImageView imageView) {
-            imageViewReference = new WeakReference<ImageView>(imageView);
+            imageViewReference = new WeakReference<>(imageView);
         }
 
         protected Bitmap doInBackground(Integer... params) {
@@ -155,9 +140,8 @@ public class GalleryAdapter extends BaseAdapter {
         options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
 
         options.inJustDecodeBounds = false;
+
         return BitmapFactory.decodeFile(path, options);
-        //Matrix m = new Matrix();
-        //m.postRotate(90);
     }
 
     public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -176,5 +160,4 @@ public class GalleryAdapter extends BaseAdapter {
         }
         return inSampleSize;
     }
-
 }
