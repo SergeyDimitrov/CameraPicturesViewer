@@ -61,11 +61,7 @@ public class CameraPicturesViewerActivity extends Activity {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         screenHeight = displayMetrics.heightPixels;
 
-        Log.d("myTAG1", "Width: " + screenHeight);
-        Log.d("myTAG1", "Rows count: " + numOfRows);
-
         RelativeLayout layout = (RelativeLayout)findViewById(R.id.grid_container);
-        Log.d("myTAG1", "Layout width: " + layout.getWidth() + " " + layout.getHeight());
 
         GalleryAdapter adapter = new GalleryAdapter(this, paths, screenHeight / numOfRows);
         gallery.setAdapter(adapter);
